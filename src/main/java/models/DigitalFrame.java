@@ -24,6 +24,8 @@ public class DigitalFrame {
     @JoinColumn(name = "photoframe_id", updatable = false)
     private PhotoFrame photoFrame;
 
+
+
     public int getId() {
         return id;
     }

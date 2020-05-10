@@ -17,6 +17,7 @@
         <mapping class="models.PhotoFrame"/>
         <mapping class="models.DigitalFrame"/>
         <mapping class="models.PlainFrame"/>
+        <mapping class="models.Photo"/>
 
 
     </session-factory>

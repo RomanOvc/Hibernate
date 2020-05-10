@@ -14,6 +14,7 @@ public interface PhotoFrameDAO {
 
     PhotoFrame getById(int id) throws SQLException;
 
+    PhotoFrame getByName(String name) throws SQLException;
     //update
     void update(PhotoFrame photoFrame) throws SQLException;
 

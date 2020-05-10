@@ -14,6 +14,7 @@ public class Main {
     static final String PASS = "";
     static final String HOST = "localhost:3307";
     private static String File = "test1.csv";
+    private static String File1 = "photo.csv";
 
     public static void main(String[] args) throws Exception {
         DBConn conn = null;
@@ -21,9 +22,10 @@ public class Main {
             conn = DBConn.OpenConnection(HOST, USER, "");
             conn.setupPhotoFrameDB();
             logic_hibernate.addField(File);
+
             logic_hibernate.main();
             conn.DropShema();
-            HibernateUtil.shutdown();
+            // HibernateUtil.shutdown();
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             System.exit(-1);

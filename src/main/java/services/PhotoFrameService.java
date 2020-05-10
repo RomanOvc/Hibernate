@@ -93,6 +93,22 @@ public class PhotoFrameService extends SessionUtil implements PhotoFrameDAO {
 
     }
 
+
+    @Override
+    public PhotoFrame getByName(String name) throws SQLException {
+        openTransactionSession();
+        String sql = "SELECT * FROM photoframe WHERE name = :name";
+        Session session = getSession();
+        Query query = session.createNativeQuery(sql).addEntity(PhotoFrame.class);
+        query.setParameter("name", name);
+        PhotoFrame address = (PhotoFrame) query.getSingleResult();
+        //close session with a transaction
+        closeTransactionSession();
+        return address;
+
+    }
+
+
     @Override
     public void update(PhotoFrame photoFrame) throws SQLException {
         openTransactionSession();

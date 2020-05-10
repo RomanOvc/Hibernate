@@ -1,17 +1,17 @@
 import au.com.bytecode.opencsv.CSVReader;
 import models.DigitalFrame;
+import models.Photo;
 import models.PhotoFrame;
 import models.PlainFrame;
 import services.DigitalFrameService;
 import services.PhotoFrameService;
+import services.PhotoService;
 import services.PlainFrameService;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class logic_hibernate {
 
@@ -28,16 +28,19 @@ public class logic_hibernate {
         return reader.readAll();
     }
 
+
     //Add field in database
     public static void addField(String File) throws IOException, SQLException {
         logic_hibernate.readCSV(File);
         PhotoFrameService photoFrameService = new PhotoFrameService();
         DigitalFrameService digitalFrameService = new DigitalFrameService();
         PlainFrameService plainFrameService = new PlainFrameService();
+        PhotoService photoService = new PhotoService();
 
         PhotoFrame photoFrame = new PhotoFrame();
         DigitalFrame digitalFrame = new DigitalFrame();
         PlainFrame plainFrame = new PlainFrame();
+
         for (String[] row : logic_hibernate.readCSV(File)) {
             for (String a : row) {
                 String[] k = a.split(";");
@@ -51,9 +54,18 @@ public class logic_hibernate {
                     digitalFrame.setSize(k[6]);
                     digitalFrame.setPhotoFrame(photoFrame);
                     photoFrame.setDigitalFrame(digitalFrame);
-                    photoFrameService.add(photoFrame);
+//                    photoFrameService.add(photoFrame);
                     digitalFrameService.add(digitalFrame);
-                } else if (k[3].equals("plain")) {
+                    Set<Photo> photos = new HashSet<Photo>();
+                    for (int i = 8; i <= a.split(";").length; i++) {
+                        Photo photo = new Photo();
+                        photo.setPhoto_name(k[i - 1]);
+                        photos.add(photo);
+                        photo.setPhotoFrame(photoFrame);
+                        photoFrame.setPhotos(photos);
+                    }
+                    photoFrameService.add(photoFrame);
+                } else {
                     plainFrame.setMaterial(k[4]);
                     plainFrame.setWidth(k[5]);
                     plainFrame.setMaterial_insert(k[6]);
@@ -69,15 +81,18 @@ public class logic_hibernate {
 
     //this default method
     public static void main() throws SQLException {
+        System.out.print("При запуске программы в базе данных создаются таблицы и добавляются записи. ");
         boolean status = true;
         while (status) {
             Scanner in = new Scanner(System.in);
-            System.out.print("При запуске программы в базе данных создаются таблицы и добавляются записи. ");
+
             System.out.println("Выберите дальнейшее действие:");
             System.out.println("'update' - Обновление данных по id фото рамки ");
             System.out.println("'delete' - удаление данных по выбранному id фоторамки");
             System.out.println("'select' - выборка всех данных из бд ");
             System.out.println("'select_id' - выборка данных по id");
+            System.out.println("'show' - список цифровых рамок у которых есть фото в хранилище ");
+            System.out.println("'show_full_image' - просмотр содержащихся фотографии в цифрово рамке");
             System.out.println("'stop' - заверешение программы");
             System.out.print("Input method: ");
             String method = in.nextLine();
@@ -98,6 +113,14 @@ public class logic_hibernate {
                     selectById();
 //                    System.out.println("this select id method");
                     break;
+                case "show":
+                    showMethod();
+//                    System.out.println("this select id method");
+                    break;
+                case "show_full_image":
+                    show_full_image();
+//                    System.out.println("this select id method");
+                    break;
                 case "stop":
                     status = false;
                     break;
@@ -106,6 +129,28 @@ public class logic_hibernate {
                     break;
             }
         }
+    }
+
+    private static void show_full_image() throws SQLException {
+        PhotoService photoService = new PhotoService();
+        photoService.getAll();
+        boolean status = true;
+        while (status) {
+            System.out.println("выберите название фоторамки:");
+            Scanner in = new Scanner(System.in);
+            while (status) {
+                Scanner inn = new Scanner(System.in);
+                System.out.print("Input name: ");
+                String name = inn.nextLine();
+                photoService.getByName(name);
+
+                status = false;
+                break;
+
+
+            }
+        }
+
     }
 
     public static void updatePhotoframe() throws SQLException {
@@ -340,7 +385,6 @@ public class logic_hibernate {
         PhotoFrameService photoFrameService = new PhotoFrameService();
         DigitalFrameService digitalFrameService = new DigitalFrameService();
         PlainFrameService plainFrameService = new PlainFrameService();
-
         PhotoFrame photoFrame = new PhotoFrame();
         DigitalFrame digitalFrame = new DigitalFrame();
         PlainFrame plainFrame = new PlainFrame();
@@ -362,6 +406,10 @@ public class logic_hibernate {
         }
     }
 
+    public static void showMethod() throws SQLException {
+        PhotoService photoService = new PhotoService();
+        photoService.getAll();
+    }
 
     public static void selectAll() throws SQLException {
         PhotoFrameService photoFrameService = new PhotoFrameService();
@@ -377,11 +425,9 @@ public class logic_hibernate {
         Scanner in = new Scanner(System.in);
         int id = in.nextInt();
         if (photoFrameService.getById(id).getType().equals("digital")) {
-            digitalFrameService.getByIdPhotoFrame(id);
+            System.out.println(digitalFrameService.getByIdPhotoFrame(id));
         } else {
-            plainFrameService.getByIdPhotoFrame(id);
+            System.out.println(plainFrameService.getByIdPhotoFrame(id));
         }
     }
-
-
 }

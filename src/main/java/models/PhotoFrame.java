@@ -1,6 +1,9 @@
 package models;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "photoframe")
@@ -29,6 +32,18 @@ public class PhotoFrame {
     @OneToOne(mappedBy = "photoFrame")
     private PlainFrame plainFrame;
 
+
+    @OneToMany(cascade=CascadeType.ALL)
+    @JoinColumn(name = "frame_id")
+    private Set<Photo> photos;
+
+    public Set<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(Set<Photo> photos) {
+        this.photos = photos;
+    }
 
     public int getId() {
         return id;
@@ -85,6 +100,7 @@ public class PhotoFrame {
     public void setPlainFrame(PlainFrame plainFrame) {
         this.plainFrame = plainFrame;
     }
+
 
     @Override
     public String toString() {
